@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Camera Stream with Object Detection</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>  </head>
+<body>
+    <h1>Live Camera Stream</h1>
+    <div id="camera-container"></div>
+    <script>
+        $(document).ready(function() {
+            // Access webcam using JavaScript
+            navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                var video = document.createElement('video');
+                video.autoplay = true;
+                video.srcObject = stream;
+                $('#camera-container').append(video);
+            })
+            .catch(function(error) {
+                console.error("Error accessing webcam:", error);
+            });
+        });
+    </script>
+</body>
+</html>
