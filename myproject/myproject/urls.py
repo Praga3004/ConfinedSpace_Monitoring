@@ -19,5 +19,6 @@ from django.urls import path
 from safesight import views
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('camera-stream/', views.detect_objects, name='camera_stream'),
    
 ]
