@@ -2,25 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Live Camera Stream with Object Detection</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>  </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streaming Video</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #video {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+        }
+    </style>
+</head>
 <body>
-    <h1>Live Camera Stream</h1>
-    <div id="camera-container"></div>
+    <video id="video" autoplay></video>
     <script>
-        $(document).ready(function() {
-            // Access webcam using JavaScript
-            navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function(stream) {
-                var video = document.createElement('video');
-                video.autoplay = true;
-                video.srcObject = stream;
-                $('#camera-container').append(video);
-            })
-            .catch(function(error) {
-                console.error("Error accessing webcam:", error);
-            });
-        });
+        const video = document.getElementById('video');
+        const source = new Source('/video', {type: 'video/x-mjpeg'});
+        video.appendChild(source);
+        video.play();
     </script>
 </body>
 </html>

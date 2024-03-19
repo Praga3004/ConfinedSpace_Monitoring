@@ -2,15 +2,27 @@ from django.shortcuts import render, HttpResponse
 import datetime
 import cv2
 from ultralytics import YOLO
+import keyboard
+import time
 
 # Load the YOLOv8 model (outside the view function for efficiency)
 model = YOLO('safesight\\best.pt')  # Replace with your model path
-
+waiting=True
 def detect_objects(request):
     if request.method == 'GET':
         return render(request, 'camera_stream.html')  # Render template for camera access
     else:
         return HttpResponse('Invalid request')
+def wait_for_q(timeout,wait):
+    start_time = time.time()
+    while wait:
+        if keyboard.is_pressed('q'):
+            wait=False
+            return False
+        current_time = time.time()
+        if current_time - start_time >= timeout:
+            return True
+     # Return the updated looping flag
 
 def video_feed(request):
     # FourCC code for video recording (adjust as needed)
@@ -20,8 +32,9 @@ def video_feed(request):
     is_recording = False
 
     cap = cv2.VideoCapture(0)
-
-    while True:
+    
+    looping = True
+    while looping:
         ret, frame = cap.read()
 
         if not ret:
@@ -29,7 +42,10 @@ def video_feed(request):
             break
 
         results = model(frame)
-        labels = ['boots', 'face_mask', 'face_nomask', 'glasses', 'goggles', 'hand_glove', 'hand_noglove', 'head_helmet', 'head_nohelmet', 'person', 'shoes', 'vest']
+        
+        labels = ['boots', 'face_mask', 'face_nomask', 'glasses', 'goggles',
+                  'hand_glove', 'hand_noglove', 'head_helmet', 'head_nohelmet',
+                  'person', 'shoes', 'vest']
 
         detected_objects = []
         for result in results:
@@ -50,14 +66,11 @@ def video_feed(request):
                     video_writer.release()
                     print("Stop recording and save video!")
 
-                detected_objects.append({
-                    'label': cls_id,
-                    'confidence': confidence
-                })
-
-        # Optionally process the frame for display (e.g., draw bounding boxes)
-        # ... (your logic to draw bounding boxes and labels on the frame)
-
+                # Optionally process the frame for display (e.g., draw bounding boxes)
+                # ... (your logic to draw bounding boxes and labels on the frame)
+            cv2.imshow('Live Camera Feed', frame)
+            looping=wait_for_q(2,wait=waiting)
+            print(looping)
         # Record frame if recording is active
         if is_recording:
             video_writer.write(frame)
@@ -65,9 +78,7 @@ def video_feed(request):
         # Display the frame (assuming you have a mechanism to send the frame data to the client)
         # ... (your logic to send the frame data to the client-side for display)
 
-        # Exit loop if 'q' key is pressed
-        if cv2.waitKey(1) == ord('q'):
-            break
+     # Call wait_for_key function
 
     # Release resources
     if is_recording:
