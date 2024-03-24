@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse,redirect
 import datetime
 import cv2
 from ultralytics import YOLO
@@ -83,4 +83,4 @@ def video_feed(request):
     cap.release()
     cv2.destroyAllWindows() 
 
-    return HttpResponse('Streaming stopped')
+    return redirect('/camera-stream')

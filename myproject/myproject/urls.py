@@ -17,9 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from safesight import views
-from user.views import login_view
+from user.views import login_view,register
 urlpatterns = [
-      path('login/', login_view, name='login'),path('admin/', admin.site.urls),
+    path('register/',register,name='register'),
+      path('login/', login_view, name='login'),
+   
     path('admin/', admin.site.urls),
     path('camera-stream/', views.detect_objects, name='camera_stream'),
     path('video_feed/', views.video_feed, name='video_feed'),
