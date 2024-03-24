@@ -3,26 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Video</title>
+    <title>Live Camera Stream</title>
     <style>
         body {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
             margin: 0;
-            padding: 0;
+            color: aqua;
+            background-color: #333; /* Set your desired background color */
         }
+        
+        #video-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
         #video {
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
+            border: 5px solid rgb(255, 0, 0); /* Adjust border style and color as needed */
+        }
+
+        #buttons {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <video id="video" autoplay></video>
+    <h1>Live Camera</h1>
+    <div id="video-container">
+        <video id="video" width="640" height="480" autoplay muted></video>
+    </div>
+    <div id="buttons">
+        <button id="monitorButton">Click to Monitor</button>
+        <button id="stopButton">Stop Stream</button> <!-- New button to stop the stream -->
+    </div>
     <script>
         const video = document.getElementById('video');
-        const source = new Source('/video', {type: 'video/x-mjpeg'});
-        video.appendChild(source);
-        video.play();
+        const monitorButton = document.getElementById('monitorButton');
+        const stopButton = document.getElementById('stopButton'); // Reference to the stop button
+
+        monitorButton.addEventListener('click', function() {
+            // Stop the video stream before redirecting
+            stopStream();
+            // Redirect to the next page
+            window.location.href = "{% url 'video_feed' %}";
+        });
+
+        stopButton.addEventListener('click', stopStream); // Attach click event listener to the stop button
+
+        function stopStream() {
+            const stream = video.srcObject;
+            const tracks = stream.getTracks();
+            tracks.forEach(track => {
+                track.stop();
+            });
+        }
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(error => {
+                alert("Error accessing camera: " + error);
+            });
     </script>
 </body>
 </html>
